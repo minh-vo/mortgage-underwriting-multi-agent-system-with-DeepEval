@@ -36,6 +36,55 @@ The system splits underwriting across a team of cooperating agents arranged in t
 5. The Decision Agent produces a verdict backed by a risk score. A senior underwriter is pulled in only when the result is a conditional approval.
 6. Each run is evaluated against six agentic metrics from DeepEval.
 
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    A["Loan Application<br/><i>raw borrower file</i>"] --> B["PII Sanitizer<br/><i>redacts personal data</i>"]
+    B -->|"sanitized file"| S["Supervisor<br/><i>plans and routes work</i>"]
+
+    subgraph SPEC ["Specialist Analysts"]
+        direction LR
+        C1["Credit<br/><i>credit history</i>"]
+        C2["Income<br/><i>employment, DTI</i>"]
+        C3["Asset<br/><i>cash to close, reserves</i>"]
+        C4["Collateral<br/><i>property value, LTV</i>"]
+        C1 ~~~ C2 ~~~ C3 ~~~ C4
+    end
+
+    S <-->|"assigns work · returns analyses"| SPEC
+    SPEC <-.->|"tool calls"| MCP["MCP Tool Server<br/><i>calculators + policy retrieval</i>"]
+
+    S <-->|"review · pass/fail verdict"| CR["Critic · A2A<br/><i>checks for contradictions</i>"]
+    S -->|"pass, or 3 reworks used"| D["Decision Agent<br/><i>risk score 0–100</i>"]
+
+    D -->|"score 0–30"| AP["Approved"]
+    D -->|"score 31–60"| CO["Conditional Approval<br/><i>pauses for human review</i>"]
+    D -->|"score 61–100"| DN["Denied<br/><i>adverse action notice</i>"]
+    CO -->|"sign-off"| HU["Senior Underwriter<br/><i>overrides need justification</i>"]
+
+    AP & DN & HU --> R["Audit Trail<br/><i>plans, tool calls, bias flags</i>"]
+    R --> E["DeepEval<br/><i>six agentic metrics</i>"]
+
+    classDef input fill:#e3f2fd,stroke:#1565c0,color:#000
+    classDef coord fill:#fff3e0,stroke:#ef6c00,color:#000
+    classDef agent fill:#f3e5f5,stroke:#8e24aa,color:#000
+    classDef service fill:#e0f7fa,stroke:#00838f,color:#000
+    classDef good fill:#e8f5e9,stroke:#2e7d32,color:#000
+    classDef warn fill:#fff9c4,stroke:#f9a825,color:#000
+    classDef bad fill:#ffebee,stroke:#c62828,color:#000
+
+    class A,B,R,E input
+    class S coord
+    class C1,C2,C3,C4,D agent
+    class MCP,CR service
+    class AP good
+    class CO,HU warn
+    class DN bad
+```
+
+Solid arrows show how the loan file moves through the system, and the dotted arrow shows tool calls. When the Critic fails an analysis, the Supervisor sends it back to the relevant specialist, for up to three rounds. Only conditional approvals go to a person.
+
 ## Architecture Details
 
 ### Specialist Analysts

@@ -1,0 +1,283 @@
+{
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "profile": "Strong W-2 earner",
+      "application": {
+        "case_id": "CASE-001",
+        "application_date": "2026-03-02",
+        "applicant": {
+          "name": "Priya Raman",
+          "ssn": "900-55-0142",
+          "phone": "(614) 555-0142",
+          "email": "priya.raman@example.com",
+          "address": "2208 Larkspur Court, Columbus, OH 43085"
+        },
+        "credit": {
+          "credit_score": 775,
+          "bankruptcy": null,
+          "foreclosure_date": null,
+          "late_payments": [],
+          "collections": [],
+          "notes": "Eleven open accounts, all paid as agreed. No derogatory items on file."
+        },
+        "employment": {
+          "type": "W2",
+          "employer": "Riverbend Regional Hospital",
+          "position": "Clinical Pharmacist",
+          "start_date": "2018-08-13",
+          "years_in_line_of_work": 11,
+          "gaps": [],
+          "base_salary": 132000,
+          "bonus": {"2024": 12000, "2025": 15000},
+          "bonus_expected_to_continue": true,
+          "self_employed_net_income": null
+        },
+        "debts": {
+          "auto_loan": 430,
+          "student_loan": 240,
+          "credit_cards": 80
+        },
+        "assets": {
+          "checking": 60000,
+          "savings": 115000,
+          "retirement": 210000,
+          "gift_funds": null,
+          "recent_deposits": [
+            {"date": "2026-02-13", "amount": 15000, "description": "Annual bonus, employer payroll", "payroll": true, "source_documented": true},
+            {"date": "2026-02-27", "amount": 4050, "description": "Biweekly salary", "payroll": true, "source_documented": true}
+          ]
+        },
+        "loan": {
+          "amount": 400000,
+          "down_payment": 120000,
+          "closing_costs": 11000,
+          "piti": {"principal_interest": 2528, "taxes": 280, "insurance": 92, "hoa": 0, "mortgage_insurance": 0}
+        },
+        "property": {
+          "purchase_price": 520000,
+          "appraised_value": 525000,
+          "type": "single_family",
+          "repairs": []
+        }
+      },
+      "expected": {
+        "acceptable_outcomes": ["APPROVED"],
+        "human_review_expected": false
+      }
+    },
+    {
+      "case_id": "CASE-002",
+      "profile": "Borderline, curable",
+      "application": {
+        "case_id": "CASE-002",
+        "application_date": "2026-03-02",
+        "applicant": {
+          "name": "Tomas Lindqvist",
+          "ssn": "900-41-0177",
+          "phone": "(503) 555-0177",
+          "email": "t.lindqvist@example.com",
+          "address": "915 Alder Row, Unit 3B, Portland, OR 97214"
+        },
+        "credit": {
+          "credit_score": 728,
+          "bankruptcy": null,
+          "foreclosure_date": null,
+          "late_payments": [
+            {"days_late": 30, "date": "2025-08-04", "account": "Store credit card"}
+          ],
+          "collections": [],
+          "notes": "One 30-day late payment on a store card about seven months before application. All other accounts current."
+        },
+        "employment": {
+          "type": "W2",
+          "employer": "Cascade Freight Partners",
+          "position": "Logistics Analyst",
+          "start_date": "2021-05-03",
+          "years_in_line_of_work": 7,
+          "gaps": [],
+          "base_salary": 108000,
+          "bonus": {"2024": 0, "2025": 6000},
+          "bonus_expected_to_continue": false,
+          "self_employed_net_income": null
+        },
+        "debts": {
+          "auto_loan": 520,
+          "student_loan": 630,
+          "credit_cards": 600
+        },
+        "assets": {
+          "checking": 41000,
+          "savings": 84000,
+          "retirement": 38000,
+          "gift_funds": null,
+          "recent_deposits": [
+            {"date": "2025-12-19", "amount": 6000, "description": "Year-end bonus, employer payroll", "payroll": true, "source_documented": true},
+            {"date": "2026-02-27", "amount": 3300, "description": "Biweekly salary", "payroll": true, "source_documented": true}
+          ]
+        },
+        "loan": {
+          "amount": 264000,
+          "down_payment": 96000,
+          "closing_costs": 7500,
+          "piti": {"principal_interest": 1669, "taxes": 300, "insurance": 60, "hoa": 371, "mortgage_insurance": 0}
+        },
+        "property": {
+          "purchase_price": 360000,
+          "appraised_value": 356000,
+          "type": "condominium",
+          "repairs": [
+            {"description": "Repaint interior walls", "cost": 1900, "category": "cosmetic"},
+            {"description": "Replace worn bedroom carpet", "cost": 1300, "category": "cosmetic"}
+          ]
+        }
+      },
+      "expected": {
+        "acceptable_outcomes": ["CONDITIONAL_APPROVAL"],
+        "human_review_expected": true
+      }
+    },
+    {
+      "case_id": "CASE-003",
+      "profile": "Near the deny edge",
+      "application": {
+        "case_id": "CASE-003",
+        "application_date": "2026-03-02",
+        "applicant": {
+          "name": "Denise Okafor",
+          "ssn": "900-37-0119",
+          "phone": "(816) 555-0119",
+          "email": "denise.okafor@example.com",
+          "address": "4410 Wren Hollow Drive, Kansas City, MO 64114"
+        },
+        "credit": {
+          "credit_score": 668,
+          "bankruptcy": null,
+          "foreclosure_date": null,
+          "late_payments": [],
+          "collections": [],
+          "notes": "No late payments in the last two years. Revolving balances are high relative to limits."
+        },
+        "employment": {
+          "type": "W2",
+          "employer": "Maple Ridge School District",
+          "position": "High School Science Teacher",
+          "start_date": "2025-02-03",
+          "years_in_line_of_work": 9,
+          "gaps": [
+            {"start": "2024-11-25", "end": "2025-02-02", "reason": "Moved to a new district between school terms", "documented": true}
+          ],
+          "base_salary": 90000,
+          "bonus": {"2024": 0, "2025": 0},
+          "bonus_expected_to_continue": false,
+          "self_employed_net_income": null
+        },
+        "debts": {
+          "auto_loan": 610,
+          "student_loan": 420,
+          "credit_cards": 470
+        },
+        "assets": {
+          "checking": 14500,
+          "savings": 31000,
+          "retirement": 52000,
+          "gift_funds": null,
+          "recent_deposits": [
+            {"date": "2026-02-27", "amount": 2750, "description": "Biweekly salary", "payroll": true, "source_documented": true}
+          ]
+        },
+        "loan": {
+          "amount": 279000,
+          "down_payment": 31000,
+          "closing_costs": 6500,
+          "piti": {"principal_interest": 1672, "taxes": 215, "insurance": 68, "hoa": 0, "mortgage_insurance": 95}
+        },
+        "property": {
+          "purchase_price": 310000,
+          "appraised_value": 310000,
+          "type": "townhouse",
+          "repairs": []
+        }
+      },
+      "expected": {
+        "acceptable_outcomes": ["CONDITIONAL_APPROVAL", "DENIED"],
+        "human_review_expected": true
+      }
+    },
+    {
+      "case_id": "CASE-004",
+      "profile": "Weak",
+      "application": {
+        "case_id": "CASE-004",
+        "application_date": "2026-03-02",
+        "applicant": {
+          "name": "Marcus Bellweather",
+          "ssn": "900-62-0188",
+          "phone": "(505) 555-0188",
+          "email": "marcus@bellweather-landscaping.example.com",
+          "address": "77 Juniper Flat Road, Albuquerque, NM 87109"
+        },
+        "credit": {
+          "credit_score": 588,
+          "bankruptcy": {"chapter": 13, "discharge_date": "2025-07-01"},
+          "foreclosure_date": null,
+          "late_payments": [
+            {"days_late": 60, "date": "2025-10-06", "account": "Equipment loan"},
+            {"days_late": 30, "date": "2025-06-09", "account": "Credit card"}
+          ],
+          "collections": [
+            {"type": "non_medical", "amount": 2600},
+            {"type": "medical", "amount": 900}
+          ],
+          "notes": "Chapter 13 plan discharged eight months before application. A 60-day late payment followed the discharge."
+        },
+        "employment": {
+          "type": "self_employed",
+          "employer": "Bellweather Landscaping (owner)",
+          "position": "Owner",
+          "start_date": "2021-04-01",
+          "years_in_line_of_work": 8,
+          "gaps": [],
+          "base_salary": 0,
+          "bonus": {"2024": 0, "2025": 0},
+          "bonus_expected_to_continue": false,
+          "self_employed_net_income": {"2024": 96000, "2025": 70000}
+        },
+        "debts": {
+          "truck_loan": 720,
+          "equipment_loan": 640,
+          "credit_cards": 540
+        },
+        "assets": {
+          "checking": 9000,
+          "savings": 10000,
+          "retirement": 0,
+          "gift_funds": null,
+          "recent_deposits": [
+            {"date": "2026-01-20", "amount": 12000, "description": "Cash deposit, no paperwork provided", "payroll": false, "source_documented": false},
+            {"date": "2026-02-10", "amount": 2400, "description": "Customer invoice payment", "payroll": false, "source_documented": true}
+          ]
+        },
+        "loan": {
+          "amount": 305000,
+          "down_payment": 25000,
+          "closing_costs": 6000,
+          "piti": {"principal_interest": 1928, "taxes": 190, "insurance": 62, "hoa": 0, "mortgage_insurance": 120}
+        },
+        "property": {
+          "purchase_price": 330000,
+          "appraised_value": 318000,
+          "type": "single_family",
+          "repairs": [
+            {"description": "Sagging roof framing over the garage", "cost": 9000, "category": "structural"},
+            {"description": "Furnace does not run; no working heat", "cost": 4200, "category": "safety"}
+          ]
+        }
+      },
+      "expected": {
+        "acceptable_outcomes": ["DENIED"],
+        "human_review_expected": false
+      }
+    }
+  ]
+}

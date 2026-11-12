@@ -1,0 +1,195 @@
+{
+  "run_date": "2026-11-12",
+  "judge_model": "claude-opus-5-5",
+  "model": "claude-opus-5-5",
+  "cases": {
+    "CASE-001": {
+      "decision": "APPROVED",
+      "risk_score": 8,
+      "human_review": false,
+      "reworks": 0,
+      "run_cost_usd": 0.305172,
+      "judge_cost_usd": 0.44442799999999993,
+      "metrics": {
+        "Task Completion": {
+          "score": 0.95,
+          "passed": true,
+          "reason": "All required elements were met. Credit, income, assets and collateral were each analysed with calculator tools and the relevant policy sections. The critic quality-reviewed the analyses and passed them. A valid decision (APPROVED) was issued with a risk score inside the policy band and a full decision memo. The figures are consistent: 76.92% LTV, 30.1% back-end DTI, 23.92% front-end ratio, 15.2 months of reserves. One minor point: the reported $4,000 gap between the assets figures ($175,000 \u2212 $131,000 = $44,000) checks out, but the reserves figure cannot be cross-checked against the obligations without the full case data. No significant gaps remain."
+        },
+        "Step Efficiency": {
+          "score": 0.75,
+          "passed": true,
+          "reason": "The workflow ran the four specialists in parallel, then the critic, then the decision agent. Each specialist used only the calculator and policy tools relevant to its area, with no repeated calls or rework loops. The only minor overhead is the income analyst's separate total_obligations call for a simple sum and the separate supervisor routing calls between stages, where the next step was already fixed."
+        },
+        "Tool Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "[\n\t Tool Calling Reason: All expected tools ['credit_score_tier', 'total_obligations', 'dti_ratio', 'housing_ratio', 'reserves', 'large_deposits', 'ltv_ratio'] were called (order not considered).\n\t Tool Selection Reason: The agent paired each underwriting area with its matching calculator and the relevant policy chapter: credit_score_tier with get_policy for chapter 1; total_obligations, dti_ratio and housing_ratio with chapter 2; reserves and large_deposits with chapter 3; and ltv_ratio with chapter 4. Every specialized calculator was used for its stated purpose. Fetching whole chapters with get_policy made search_policy unnecessary, and no tool was mis-selected or redundant; the quality review and memo require no tool from the list.\n]\n"
+        },
+        "Argument Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "The score is 1.00 because every tool call for underwriting CASE-001 used correct, well-formed arguments. The credit, income, asset and collateral analyses, the policy checks and the quality review were all set up properly to support a sound decision. Nicely done!"
+        },
+        "Plan Quality": {
+          "score": 0.5,
+          "passed": true,
+          "reason": "The plan covers the required phases in a sensible order: parallel specialist analyses, Critic review, then the Decision Agent's decision and memo. It never says that the calculator and policy tools must be used, and it names no metrics such as DTI, LTV, reserves or credit score thresholds. It also has no step for handling Critic rework and does not state that the decision must be APPROVED, CONDITIONAL_APPROVAL or DENIED, so the steps are too vague to execute reliably."
+        },
+        "Plan Adherence": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "Step 1 matches the supervisor dispatching credit, income, assets and collateral with areas_run_in_parallel=true, followed by the four analysts using calculator and get_policy tools. Step 2 matches the supervisor routing to the critic, which returned 'pass' with no rework_targets. Step 3 matches the supervisor routing to decision_agent, which produced the risk score and memo; the supervisor routing entries are orchestration of the planned steps, and no extraneous actions, missing steps or reordering appear."
+        }
+      },
+      "checks": {
+        "decision in acceptable set": true,
+        "human review as expected": true,
+        "no bias flags": true,
+        "no rework without a major defect": true,
+        "every analyst looked up the policy": true
+      }
+    },
+    "CASE-002": {
+      "decision": "CONDITIONAL_APPROVAL",
+      "risk_score": 44,
+      "human_review": true,
+      "reworks": 0,
+      "run_cost_usd": 0.351632,
+      "judge_cost_usd": 0.4917760000000001,
+      "metrics": {
+        "Task Completion": {
+          "score": 0.95,
+          "passed": true,
+          "reason": "The workflow covered every required element. Credit, income, assets and collateral were each analysed with the calculator tools (ltv_ratio, credit_score_tier, reserves, large_deposits, total_obligations, dti_ratio, housing_ratio) and checked against the relevant policy sections via get_policy. A critic quality-reviewed the analyses and passed them with one minor defect. The final decision was CONDITIONAL_APPROVAL, a valid outcome, with sensible conditions and a decision memo that resolved the critic's defect. Human review confirmed the decision. The figures are internally consistent. The only small concern is that the DTI exception rests on two compensating factors that cannot be independently verified against policy thresholds, though the decision prudently makes confirming them a condition."
+        },
+        "Step Efficiency": {
+          "score": 0.75,
+          "passed": true,
+          "reason": "The workflow ran the four specialists in parallel, needed one critic pass with no rework, and reached a decision through a direct supervisor sequence, with each tool call feeding a cited finding. The one avoidable call is the income analyst's separate total_obligations tool call to sum three debts plus PITI before calling dti_ratio, a trivial step that could have been folded into the DTI calculation. Supervisor routing turns were constrained to single allowed moves, which adds minor orchestration overhead."
+        },
+        "Tool Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "[\n\t Tool Calling Reason: All expected tools ['credit_score_tier', 'total_obligations', 'dti_ratio', 'housing_ratio', 'reserves', 'large_deposits', 'ltv_ratio'] were called (order not considered).\n\t Tool Selection Reason: The agent covered every analysis area with the matching tool: credit_score_tier for credit, total_obligations then dti_ratio and housing_ratio for income, reserves and large_deposits for assets, and ltv_ratio for collateral. It pulled the relevant policy chapters (1\u20134) with get_policy, which fit better than search_policy since the sections were known. No suitable tool was left out, and quality review and the memo fall outside the available tools.\n]\n"
+        },
+        "Argument Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "The score is 1.00 because there were no incorrect tool calls. Every argument passed to the calculator and policy tools was appropriate for underwriting mortgage application CASE-002, covering the credit, income, asset and collateral analyses. Nicely done."
+        },
+        "Plan Quality": {
+          "score": 0.5,
+          "passed": true,
+          "reason": "The plan covers the core flow: parallel credit, income, asset and collateral analyses, Critic review, then the Decision Agent and memo. It never says the analyses will use the calculator and policy tools (e.g., computing DTI and LTV and checking them against policy thresholds), and it has no revision loop if the Critic fails an analysis. It also lists specific conditions (letter of explanation, condo project review, repair holdback, DTI compensating factors) before any analysis is done, which presumes a conditional approval and gives no criteria for choosing between APPROVED, CONDITIONAL_APPROVAL and DENIED."
+        },
+        "Plan Adherence": {
+          "score": 0.75,
+          "passed": true,
+          "reason": "Plan steps 1\u20134 match the trace in order. The supervisor ran the credit, income, assets and collateral analysts in parallel, routed the completed analyses to the Critic, and passed the file to the Decision Agent after the Critic's 'pass' verdict. The decision memo lists all four planned conditions (LOE, condo project review, repair holdback, DTI compensating-factor confirmation). One step not in the plan was added: a trailing 'human_review' node after the decision."
+        }
+      },
+      "checks": {
+        "decision in acceptable set": true,
+        "human review as expected": true,
+        "no bias flags": true,
+        "no rework without a major defect": true,
+        "every analyst looked up the policy": true
+      }
+    },
+    "CASE-003": {
+      "decision": "DENIED",
+      "risk_score": 76,
+      "human_review": false,
+      "reworks": 0,
+      "run_cost_usd": 0.34926399999999996,
+      "judge_cost_usd": 0.48211999999999994,
+      "metrics": {
+        "Task Completion": {
+          "score": 0.95,
+          "passed": true,
+          "reason": "The system fully covered the workflow. All four areas were analysed by specialists using calculator and policy tools. A critic quality-reviewed the analyses. A final decision of DENIED was reached, which is consistent with two unmet policy requirements (DTI 47.33% vs 43% with no compensating factors, reserves 3.9 vs 6 months). The decision memo includes the rationale, key figures, findings by area, the quality review, adverse action reasons citing policy sections, and reapplication guidance. The figures are internally consistent: $3,550 \u00d7 43%/47.33% \u2248 $3,225, so the stated $325/month debt reduction is correct. One minor gap: the critic passed the file without independent scrutiny, for example of the borderline credit and the 69-day employment gap. Otherwise the task was achieved."
+        },
+        "Step Efficiency": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "Each specialist made only the calculator calls its area needed plus one get_policy call for its own section; no tools were repeated or exploratory. The supervisor ran all four areas in parallel, the critic passed them with no rework loop, and the decision agent produced the memo directly with no extra calls."
+        },
+        "Tool Correctness": {
+          "score": 0.9,
+          "passed": true,
+          "reason": "[\n\t Tool Calling Reason: All expected tools ['credit_score_tier', 'total_obligations', 'dti_ratio', 'housing_ratio', 'reserves', 'large_deposits', 'ltv_ratio'] were called (order not considered).\n\t Tool Selection Reason: The agent chose the right tool for each subtask: credit_score_tier for credit, total_obligations, dti_ratio and housing_ratio for income, reserves and large_deposits for assets, and ltv_ratio for collateral. It also used get_policy to pull chapters 1\u20134 for the matching policy text, with no unnecessary or mismatched tools. The only minor gap is that it never used search_policy (or get_policy) to look up decision or conditions criteria beyond chapter 4, and no tool exists for the quality-review step.\n]\n"
+        },
+        "Argument Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "The score is 1.00 because every tool call used arguments that fit the task of underwriting CASE-003. The calculator and policy tools received appropriate inputs for analysing credit, income, assets and collateral against the underwriting policy, and no incorrect calls were found. Nicely done!"
+        },
+        "Plan Quality": {
+          "score": 0.5,
+          "passed": true,
+          "reason": "The plan covers the core flow: parallel credit, income, assets and collateral analyses, then Critic review, then the Decision Agent. It never explicitly requires the calculator and policy tools, and it never states that a decision memo with a final APPROVED, CONDITIONAL_APPROVAL or DENIED status must be produced. It also has no rework path if the Critic flags issues, and it cites specific results (47.33% DTI, 3.9 months of reserves, HIGH risk) before the analyses are run, which makes the sequencing incoherent."
+        },
+        "Plan Adherence": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "Step 1 matches the supervisor's run_specialists call on all four areas in parallel, followed by the credit, collateral, assets and income analysts. Step 2 matches the supervisor routing to the critic and citing the HIGH-risk income and assets areas, and Step 3 matches routing to decision_agent after the critic passed with empty rework_targets. Step 4 matches the decision memo's adverse action reasons covering the 47.33% back-end DTI with no exception and the 3.9-month reserves against 6 required, and the trace contains no extra or reordered actions."
+        }
+      },
+      "checks": {
+        "decision in acceptable set": true,
+        "human review as expected": false,
+        "no bias flags": true,
+        "no rework without a major defect": true,
+        "every analyst looked up the policy": true
+      }
+    },
+    "CASE-004": {
+      "decision": "DENIED",
+      "risk_score": 98,
+      "human_review": false,
+      "reworks": 0,
+      "run_cost_usd": 0.37874399999999997,
+      "judge_cost_usd": 0.499564,
+      "metrics": {
+        "Task Completion": {
+          "score": 0.95,
+          "passed": true,
+          "reason": "Every required step was done. All four areas (credit, income, assets, collateral) were analysed with the calculator tools and get_policy. The critic reviewed the analyses and passed them. The final decision, DENIED, is one of the allowed outcomes and is well supported by several clear policy failures: a 588 credit score, a recent Chapter 13 within the waiting period, 72% DTI, 0 months of reserves with a funds shortfall, and 95.91% LTV. The decision memo is complete, with a rationale, key figures, findings by area, the quality review result and adverse action reasons citing specific policy sections. Two minor issues keep this short of a perfect score. The critic passed the file with no scrutiny shown, and the 72% DTI cannot be checked from the figures given: $4,200 against the stated $5,833.33 qualifying income works out to about 72%, so it is consistent. Neither issue affects the outcome."
+        },
+        "Step Efficiency": {
+          "score": 0.9,
+          "passed": true,
+          "reason": "The trace follows the minimal required path: one supervisor dispatch, four parallel specialists that each make only the policy and calculator calls their area needs, one critic pass with no rework loop, and one decision call. The only possible overhead is the three supervisor routing calls, which the orchestration structure requires. The income analyst's separate total_obligations call before dti_ratio is a minor extra step that may have been avoidable."
+        },
+        "Tool Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "[\n\t Tool Calling Reason: All expected tools ['credit_score_tier', 'total_obligations', 'dti_ratio', 'housing_ratio', 'reserves', 'large_deposits', 'ltv_ratio'] were called (order not considered).\n\t Tool Selection Reason: The agent picked the matching calculator for each area: credit_score_tier for credit, total_obligations, dti_ratio and housing_ratio for income and debt, reserves and large_deposits for assets, and ltv_ratio for collateral. It also called get_policy for chapters 1\u20134 to check each analysis against policy text. No calculator went unused, and search_policy was unnecessary because whole chapters were retrieved directly; no available tool covers quality review, so no omission applies there.\n]\n"
+        },
+        "Argument Correctness": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "The score is 1.00 because every tool call used arguments that fit the CASE-004 underwriting task. The calculator and policy tools received appropriate inputs for the credit, income, asset and collateral analyses, and no incorrect arguments were found. Nicely done!"
+        },
+        "Plan Quality": {
+          "score": 0.25,
+          "passed": false,
+          "reason": "The last step fixes the outcome ahead of time, asserting high risk and failed eligibility tests in all four areas before any analysis has run, so the decision is biased rather than derived from evidence. The plan never says how the specialists will use the calculator and policy tools (e.g., DTI/LTV calculations, policy threshold lookups), which the task explicitly requires. It also has no path for when the Critic finds defects (no rework loop) and no criteria for choosing between APPROVED, CONDITIONAL_APPROVAL and DENIED."
+        },
+        "Plan Adherence": {
+          "score": 1.0,
+          "passed": true,
+          "reason": "Step 1 is matched: the supervisor ran the credit, income, assets and collateral specialists in parallel (areas_run_in_parallel: true), and each produced a complete analysis. Step 2 is matched: the completed analyses then went to the Critic, which returned 'pass' with no defects before any decision. Step 3 is matched: the file then went to the Decision Agent, whose DENIED memo labels all four areas HIGH risk and lists failed eligibility tests in each, with no extra or reordered actions in the trace."
+        }
+      },
+      "checks": {
+        "decision in acceptable set": true,
+        "human review as expected": true,
+        "no bias flags": true,
+        "no rework without a major defect": true,
+        "every analyst looked up the policy": true
+      }
+    }
+  }
+}

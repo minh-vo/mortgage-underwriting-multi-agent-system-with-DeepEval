@@ -2,7 +2,7 @@
 
 A team of AI agents underwrites a mortgage application. Four specialist analysts (credit, income, assets, collateral) work in parallel, a Supervisor decides each next step, a Critic reviews the quality of the analyses, and a Decision Agent scores the file and writes a decision memo. Borderline files stop for a human underwriter, who can concur or override with a written justification.
 
-You run it on your own machine: a Streamlit page shows every step as it happens, and a DeepEval run scores the agents on six agentic metrics. The applications and the policy are synthetic and were written for this repository.
+Developed as an independent capstone for Johns Hopkins certificate in Agentic AI (18 weeks, online part-time, weekly grading).  
 
 # DEMO 
 

@@ -1,5 +1,11 @@
 # Mortgage Underwriting Multi-Agent System, with DeepEval
 
+A team of AI agents underwrites a mortgage application. Four specialist analysts (credit, income, assets, collateral) work in parallel, a Supervisor decides each next step, a Critic reviews the quality of the analyses, and a Decision Agent scores the file and writes a decision memo. Borderline files stop for a human underwriter, who can concur or override with a written justification.
+
+You run it on your own machine: a Streamlit page shows every step as it happens, and a DeepEval run scores the agents on six agentic metrics. The applications and the policy are synthetic and were written for this repository.
+
+# DEMO 
+
 A live run of CASE-002, recorded from the local Streamlit page and sped up.
 
 **1. The agents work.** The Supervisor sends out the four analysts in parallel, then the Critic, then the Decision Agent. The diagram marks what is working now.
@@ -13,12 +19,6 @@ A live run of CASE-002, recorded from the local Streamlit page and sped up.
 **3. The results.** The finished diagram, the timeline, each analysis, the privacy masking and the saved DeepEval scores.
 
 ![The finished run: timeline, analyses, privacy view and the Evaluation tab](demo/3-results.gif)
-
-## What it does
-
-A team of AI agents underwrites a mortgage application. Four specialist analysts (credit, income, assets, collateral) work in parallel, a Supervisor decides each next step, a Critic reviews the quality of the analyses, and a Decision Agent scores the file and writes a decision memo. Borderline files stop for a human underwriter, who can concur or override with a written justification.
-
-You run it on your own machine: a Streamlit page shows every step as it happens, and a DeepEval run scores the agents on six agentic metrics. The applications and the policy are synthetic and were written for this repository.
 
 ### Why this problem
 

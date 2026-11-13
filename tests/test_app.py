@@ -35,6 +35,8 @@ def test_run_pause_reject_unjustified_override_then_finish(app, tmp_path, monkey
     at.sidebar.button[0].click().run()
     assert not at.exception
     assert "Paused for human review" in texts(at)
+    diagram = at.get("graphviz_chart")[0].proto.spec  # the architecture, marked with progress
+    assert "▶ Human review" in diagram and "Decision Agent ✓" in diagram and "Credit analyst ✓" in diagram
     assert "## Decision memo" in texts(at)  # the memo is shown in full beside the form
     assert "No evaluation results for this case yet" in texts(at)
 
@@ -45,6 +47,8 @@ def test_run_pause_reject_unjustified_override_then_finish(app, tmp_path, monkey
 
     at.text_area(key="why-CASE-001").set_value("Reserves are too thin.").run()
     at.button(key="submit-CASE-001").click().run()
+    diagram = at.get("graphviz_chart")[0].proto.spec
+    assert "Human review ✓" in diagram and "Final decision ✓" in diagram and "▶" not in diagram
     assert not at.exception
     page = texts(at)
     assert "Final decision: DENIED" in page and "OVERRIDDEN BY REVIEWER" in page
@@ -69,3 +73,15 @@ def test_evaluation_tab_shows_scores_from_the_results_file(app, tmp_path):
     assert "decision in acceptable set ✓" in page and "no bias flags ✗" in page
     tables = [str(d.value) for d in at.dataframe]
     assert any("Plan Adherence" in t and "PASS" in t for t in tables)
+
+
+def test_missing_key_shows_a_warning_and_disables_run(app, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")
+    at = app.run()
+    assert not at.exception
+    warning = next(w.value for w in at.warning if "Please add your Claude API key before running the program." in w.value)
+    for step in ("console.anthropic.com", str(config.ROOT / ".env"), "ANTHROPIC_API_KEY=", "Restart the app"):
+        assert step in warning
+    assert at.sidebar.button[0].disabled
+    sidebar = "\n".join(str(e.value) for e in list(at.sidebar.markdown) + list(at.sidebar.caption))
+    assert "Before you run:" in sidebar and "API key: missing" in sidebar

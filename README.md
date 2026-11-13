@@ -1,6 +1,18 @@
 # Mortgage Underwriting Multi-Agent System, with DeepEval
 
-<!-- demo.gif goes here once recorded: ![A live run: the agents underwrite one application and pause for human review](demo.gif) -->
+A live run of CASE-002, recorded from the local Streamlit page and sped up.
+
+**1. The agents work.** The Supervisor sends out the four analysts in parallel, then the Critic, then the Decision Agent. The diagram marks what is working now.
+
+![The architecture diagram lights up as the Supervisor, the four analysts, the Critic and the Decision Agent run](demo/1-agents-at-work.gif)
+
+**2. A human reviews.** The case is a conditional approval, so it pauses. The reviewer overrides it to DENIED with a written justification.
+
+![The run pauses for human review and the reviewer overrides the recommendation with a justification](demo/2-human-review.gif)
+
+**3. The results.** The finished diagram, the timeline, each analysis, the privacy masking and the saved DeepEval scores.
+
+![The finished run: timeline, analyses, privacy view and the Evaluation tab](demo/3-results.gif)
 
 ## What it does
 

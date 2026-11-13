@@ -11,12 +11,36 @@ import streamlit as st
 
 from underwriter import a2a_client, graph, metrics
 from underwriter.agents import decision
-from underwriter.config import AREAS, EVAL_RESULTS, PRICES, get_settings, load_cases, usage_cost
+from underwriter.config import AREAS, EVAL_RESULTS, PRICES, ROOT, get_settings, load_cases, usage_cost
 from underwriter.sanitize import pii_table, sanitize
 
-STAGES = ["Sanitize", "Specialists", "Critic", "Decision", "Human review"]
-STAGE_OF = {"sanitized": 0, "supervisor": 1, "specialist": 1, "critic": 2, "decision": 3,
-            "paused": 4, "final": 4}
+NODES = {"measure": "Sanitize and measure", "supervisor": "Supervisor", "credit": "Credit analyst",
+         "income": "Income analyst", "assets": "Assets analyst", "collateral": "Collateral analyst",
+         "critic": "Critic service", "decision": "Decision Agent", "human": "Human review",
+         "final": "Final decision"}
+EDGES = """
+  measure -> supervisor
+  subgraph cluster_specialists { label="Specialists, in parallel" color="#888888" fontcolor="#888888"
+                                 fontname="Helvetica" fontsize=10 credit income assets collateral }
+  supervisor -> {credit income assets collateral} [dir=both]
+  {credit income assets collateral} -> tools [style=dashed label="MCP"]
+  supervisor -> critic [dir=both label="A2A"]
+  supervisor -> decision
+  decision -> human [label="review trigger"]
+  decision -> final
+  human -> final
+"""
+KEY_HELP = f"""
+
+**What to do**
+1. **Get a key.** Sign in at https://console.anthropic.com, open **API Keys** and create one.
+   A Claude subscription (Pro or Max) is not an API key.
+2. **Open the file `{ROOT / ".env"}`.** If it does not exist, copy `.env.example`
+   (same folder) and name the copy `.env`.
+3. **Put the key on this line** and save, with no quotes or spaces: `ANTHROPIC_API_KEY=your-key-here`
+4. **Restart the app.** In the terminal where it runs, press Ctrl+C, then run
+   `uv run streamlit run app.py` again. Refreshing the browser is not enough.
+"""
 
 st.set_page_config(page_title="Mortgage underwriting agents", layout="wide")
 settings, cases = get_settings(), load_cases()
@@ -26,6 +50,13 @@ runs = st.session_state.setdefault("runs", {})  # case_id -> {thread_id, events,
 @st.cache_resource
 def start_critic():
     return a2a_client.ensure_critic_running()
+
+
+def show_error(message: str) -> None:
+    st.error(message)
+    if "authentication" in message.lower():
+        st.warning("⚠ **Please replace your Claude API key before running the program.** Claude "
+                   "rejected the key in your `.env` file: it is mistyped, expired or revoked." + KEY_HELP)
 
 
 # ---- Drawing -----------------------------------------------------------------
@@ -49,12 +80,51 @@ def key_figures(m: dict, score: int) -> None:
         column.caption(note)
 
 
-def progress(events: list[dict]) -> None:
-    current = max((STAGE_OF.get(e["type"], 0) for e in events), default=-1)
-    done = any(e["type"] == "final" for e in events)
-    parts = [f"**[{name}]**" if i == current and not done else f"{name} ✓" if i < current or done
-             else name for i, name in enumerate(STAGES)]
-    st.markdown(" → ".join(parts))
+def flow(events: list[dict]) -> None:
+    """Draw the architecture, marking the steps that are working now and the ones that finished."""
+    active, done, waiting = {"measure"}, set(), set()
+    for e in events:
+        kind = e["type"]
+        if kind == "sanitized":
+            done.add("measure")
+            active = {"supervisor"}
+        elif kind == "supervisor":  # its pick is what runs next
+            waiting = set(e["areas"]) if e["action"] == "run_specialists" else set()
+            active = set(waiting) or {e["action"]}
+            done -= active
+        elif kind == "specialist":
+            waiting.discard(e["area"])
+            if e["analysis"]["status"] == "complete":
+                done.add(e["area"])
+            active = set(waiting) or {"supervisor"}
+        elif kind == "critic":
+            done.add("critic")
+            active = {"supervisor"}
+        elif kind == "decision":
+            done |= {"supervisor", "decision"}
+            active = set()
+        elif kind == "paused":
+            active = {"human"}
+        elif kind == "final":
+            done |= active | {"final"}
+            active = set()
+        elif kind == "error":
+            active = set()
+    lines = []
+    for node, label in NODES.items():
+        if node in active:
+            lines.append(f'{node} [label="▶ {label}" fillcolor="#ffd54f" penwidth=3]')
+        elif node in done:
+            lines.append(f'{node} [label="{label} ✓" fillcolor="#c8e6c9"]')
+        else:
+            lines.append(f'{node} [label="{label}" fillcolor="#ffffff"]')
+    st.graphviz_chart(
+        'digraph { rankdir=LR bgcolor="transparent" '
+        'node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=11 fontcolor="#000000"] '
+        'edge [color="#888888" fontcolor="#888888" fontname="Helvetica" fontsize=9] '
+        'tools [label="Tool server\n7 calculators + policy lookup" fillcolor="#eeeeee" shape=cylinder] '
+        + " ".join(lines) + EDGES + "}")
+    st.caption("▶ working now · ✓ finished")
 
 
 def timeline(events: list[dict]) -> None:
@@ -75,7 +145,7 @@ def timeline(events: list[dict]) -> None:
                     st.markdown("**Rework. Feedback it was given:**")
                     st.text(e["feedback"])
                 if failed:
-                    st.error(a["error"])
+                    show_error(a["error"])
                 for call in e["tools"]:
                     st.markdown(f"`{call['tool']}({json.dumps(call['input'])})`")
                     st.caption(call["output"][:300])
@@ -93,7 +163,7 @@ def timeline(events: list[dict]) -> None:
         elif kind == "final":
             st.expander(f"✓ {e['at']} · Final decision: {e['final_decision']}")
         elif kind == "error":
-            st.error(f"{e['at']} · The run stopped: {e['message']}")
+            show_error(f"{e['at']} · The run stopped: {e['message']}")
 
 
 def critic_review(review: dict) -> None:
@@ -224,17 +294,19 @@ try:
 except a2a_client.CriticUnavailable as error:
     critic_error = str(error)
 ready = bool(settings.api_key) and not critic_error
+st.sidebar.markdown("**Before you run:** add your Claude API key to the `.env` file in the project folder.")
 clicked = st.sidebar.button("Run underwriting", type="primary", disabled=not ready)
+st.sidebar.caption("API key: " + ("found ✓" if settings.api_key else "missing ✗ (see the steps on the page)"))
 st.sidebar.caption(f"Model: {settings.model}")
 st.sidebar.caption("Critic service: " + ("unreachable" if critic_error else "running"))
 if critic_error:
     st.sidebar.error(critic_error)
-if not settings.api_key:
-    st.sidebar.info("Add ANTHROPIC_API_KEY to a .env file to run a case (see .env.example). "
-                    "A Claude subscription is not an API key.")
 
 application = sanitize(cases[case_id]["application"])
 st.title(f"{case_id} · {cases[case_id]['profile']}")
+if not settings.api_key:
+    st.warning("⚠ **Please add your Claude API key before running the program.** "
+               "No key was found, so the Run button is switched off." + KEY_HELP)
 key_figures(metrics.case_metrics(application), application["credit"]["credit_score"])
 
 if clicked:
@@ -245,8 +317,11 @@ if clicked:
     def show(event: dict) -> None:
         run["events"].append(event)
         with box.container():
-            progress(run["events"])
+            flow(run["events"])
             timeline(run["events"])
+
+    with box.container():
+        flow([])
 
     result = asyncio.run(graph.run_case(case_id, run["thread_id"], on_event=show))
     run.update(status=result["status"], state=result["state"])
@@ -260,7 +335,7 @@ else:
         review_block(case_id, run)
     elif run["status"] == "done":
         final_panel(run)
-    progress(run["events"])
+    flow(run["events"])
     left, right = st.columns(2)
     with left:
         st.subheader("Run timeline")

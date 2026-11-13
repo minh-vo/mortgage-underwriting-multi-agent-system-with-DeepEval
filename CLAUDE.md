@@ -500,4 +500,6 @@ Keep the old README's problem statement if it still fits.
 - **DeepEval trace metrics (step 0 question, settled):** in 4.2.2 TaskCompletion, StepEfficiency, PlanQuality and PlanAdherence serialize `LLMTestCase._trace_dict` to JSON for the judge. `eval/run_eval.py` sets it to the recorded run as nested spans (`name`, `type`, `input`, `output`, `children`), the shape `trace_manager.create_nested_spans_dict` produces. It is a private attribute, so recheck it if the DeepEval pin ever changes.
 - ToolCorrectness is measured once per case over all specialists' calls, with the seven calculators as `expected_tools`. "Every analyst looked up the policy" is a deterministic check.
 - A deterministic check was added beyond the four listed: every analyst called a policy tool.
+- The recording is three GIFs in `demo/` (agents at work, human review, results), shown in order at the top of the README, instead of one `demo.gif` at the root.
+- `app.py` draws a live architecture diagram (`flow()`, `st.graphviz_chart`) in place of the five-stage text progress line, and shows API key instructions in the sidebar and on the page. It is about 345 lines.
 
